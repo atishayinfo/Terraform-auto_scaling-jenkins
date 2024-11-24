@@ -16,32 +16,30 @@ pipeline {
 
         stage('Update Variables') {
             steps {
-                script {
-                    // Update Terraform variables dynamically
-                    sh """
-                    echo 'min_size = ${params.MIN_SIZE}' > terraform.tfvars
-                    echo 'max_size = ${params.MAX_SIZE}' >> terraform.tfvars
-                    echo 'desired_capacity = ${params.DESIRED_CAPACITY}' >> terraform.tfvars
-                    """
-                }
+                // Use Windows-specific shell commands
+                bat """
+                echo min_size = ${params.MIN_SIZE} > terraform.tfvars
+                echo max_size = ${params.MAX_SIZE} >> terraform.tfvars
+                echo desired_capacity = ${params.DESIRED_CAPACITY} >> terraform.tfvars
+                """
             }
         }
 
         stage('Terraform Init') {
             steps {
-                sh 'terraform init'
+                bat 'terraform init'
             }
         }
 
         stage('Terraform Plan') {
             steps {
-                sh 'terraform plan -var-file=terraform.tfvars'
+                bat 'terraform plan -var-file=terraform.tfvars'
             }
         }
 
         stage('Terraform Apply') {
             steps {
-                sh 'terraform apply -auto-approve -var-file=terraform.tfvars'
+                bat 'terraform apply -auto-approve -var-file=terraform.tfvars'
             }
         }
     }
