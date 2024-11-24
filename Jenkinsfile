@@ -7,10 +7,6 @@ pipeline {
         string(name: 'DESIRED_CAPACITY', defaultValue: '1', description: 'Desired instances in ASG')
     }
 
-    environment {
-        AWS_CREDENTIALS = credentials('aws') // Replace 'aws-credentials' with your Jenkins credential ID
-    }
-
     stages {
         stage('Checkout Code') {
             steps {
@@ -30,10 +26,7 @@ pipeline {
 
         stage('Terraform Init') {
             steps {
-                withEnv([
-                    "AWS_ACCESS_KEY_ID=${AWS_CREDENTIALS_USR}",
-                    "AWS_SECRET_ACCESS_KEY=${AWS_CREDENTIALS_PSW}"
-                ]) {
+                withAWS(credentials: 'aws') {
                     bat 'terraform init'
                 }
             }
@@ -41,10 +34,7 @@ pipeline {
 
         stage('Terraform Plan') {
             steps {
-                withEnv([
-                    "AWS_ACCESS_KEY_ID=${AWS_CREDENTIALS_USR}",
-                    "AWS_SECRET_ACCESS_KEY=${AWS_CREDENTIALS_PSW}"
-                ]) {
+                withAWS(credentials: 'aws') {
                     bat 'terraform plan -var-file=terraform.tfvars'
                 }
             }
@@ -52,10 +42,7 @@ pipeline {
 
         stage('Terraform Apply') {
             steps {
-                withEnv([
-                    "AWS_ACCESS_KEY_ID=${AWS_CREDENTIALS_USR}",
-                    "AWS_SECRET_ACCESS_KEY=${AWS_CREDENTIALS_PSW}"
-                ]) {
+                withAWS(credentials: 'aws') {
                     bat 'terraform apply -auto-approve -var-file=terraform.tfvars'
                 }
             }
